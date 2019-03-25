@@ -212,7 +212,7 @@ void YoloROSTracker::trackThread(){
       if (track_id_absent)
         if (i.frames_counter-- > 1)
             result_vec.push_back(i);
-        else it->frames_counter = std::min((unsigned)3, i.frames_counter + 1);
+        else ;//it->frames_counter = std::min((unsigned)3, i.frames_counter + 1);
     }
 
  #ifdef TRACK_OPTFLOW
