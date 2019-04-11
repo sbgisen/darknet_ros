@@ -95,13 +95,10 @@ void YoloROSTracker::initROS()
 
   boundingBoxesPublisher = nodeHandle.advertise<darknet_ros_msgs::BoundingBoxes>(
                                              boundingBoxesTopicName, boundingBoxesQueueSize, boundingBoxesLatch);
-                                             detectionImagePublisher = nodeHandle.advertise<sensor_msgs::Image>(detectionImageTopicName,
-                                             detectionImageQueueSize,
-                                             detectionImageLatch);
-
-  detectionImagePublisher = nodeHandle.advertise<sensor_msgs::Image>(detectionImageTopicName,
-                                              detectionImageQueueSize,
-                                              detectionImageLatch);
+  detectionImagePublisher = nodeHandle.advertise<sensor_msgs::Image>(
+                                              detectionImageTopicName, detectionImageQueueSize, detectionImageLatch);
+  objectDetectorPublisher = nodeHandle.advertise<std_msgs::Int8>(
+                                              objectDetectorTopicName, objectDetectorQueueSize, objectDetectorLatch);
 }
 void YoloROSTracker::initdarknet()
   {
@@ -250,7 +247,9 @@ void YoloROSTracker::publishResult(){
  #endif
     auto result_vec_draw = result_vec;
     int const colors[6][3] = { { 1,0,1 },{ 0,0,1 },{ 0,1,1 },{ 0,1,0 },{ 1,1,0 },{ 1,0,0 } };
+    objectNumber.data = 0;
     for(auto &i : result_vec){
+      objectNumber.data++;
       boundingBox.Class = classLabels[i.obj_id];
       boundingBox.prob = i.prob;
       boundingBox.x = i.x;
@@ -263,6 +262,7 @@ void YoloROSTracker::publishResult(){
       if (classLabels.size() > i.obj_id) {
             std::string obj_name = classLabels[i.obj_id];
             if (i.track_id > 0) obj_name += "_" + std::to_string(i.track_id);
+            boundingBox.Class = obj_name;
             cv::Size const text_size = getTextSize(obj_name, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, 2, 0);
             int const max_width = (text_size.width > i.w + 2) ? text_size.width : (i.w + 2);
             cv::rectangle(cur_frame, cv::Point2f(std::max((int)i.x - 1, 0), std::max((int)i.y - 30, 0)),
@@ -276,6 +276,7 @@ void YoloROSTracker::publishResult(){
         std::string fps_str = "FPS detection: " + std::to_string(current_det_fps);
         putText(cur_frame, fps_str, cv::Point2f(10, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, cv::Scalar(50, 255, 0), 2);
     }
+    objectDetectorPublisher.publish(objectNumber);
     boundingBoxesPublisher.publish(boundingBoxes);
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cur_frame).toImageMsg();
     detectionImagePublisher.publish(msg);

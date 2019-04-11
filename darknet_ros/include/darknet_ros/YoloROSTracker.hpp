@@ -49,6 +49,7 @@ namespace darknet_ros {
     image_transport::Subscriber imageSubscriber;
     ros::Publisher boundingBoxesPublisher;
     ros::Publisher detectionImagePublisher;
+    ros::Publisher objectDetectorPublisher;
 
     // Yolo Object Detector API
 
@@ -67,6 +68,8 @@ namespace darknet_ros {
     //! Detected objects.
     darknet_ros_msgs::BoundingBox boundingBox;
     darknet_ros_msgs::BoundingBoxes boundingBoxes;
+
+    std_msgs::Int8 objectNumber;
 
     // Tracking
     extrapolate_coords_t extrapolate_coords;
