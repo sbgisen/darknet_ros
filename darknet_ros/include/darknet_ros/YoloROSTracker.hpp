@@ -25,8 +25,7 @@
 #include <condition_variable>
 
 namespace darknet_ros {
-  class YoloROSTracker
-  {
+  class YoloROSTracker{
   public:
     explicit YoloROSTracker(ros::NodeHandle nh);
     ~YoloROSTracker();
