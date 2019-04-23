@@ -35,8 +35,6 @@ YoloROSTracker::YoloROSTracker(ros::NodeHandle nh)
   }
 YoloROSTracker::~YoloROSTracker(){
   exit_flag = true;
-  if(t_cap.joinable()) t_cap.join();
-  if(t_detect.joinable()) t_detect.join();
 }
 
 bool YoloROSTracker::readParameters(){
@@ -134,25 +132,19 @@ void YoloROSTracker::initdarknet(){
 }
 
 void YoloROSTracker::darknetThread(){
-  if (!t_detect.joinable()){
-    t_detect = std::thread([&]() {
-      auto current_image = det_image;
-      consumed = true;
-      // ROS_INFO("Started darknet thread");
-      while (current_image.use_count() > 0 && !exit_flag) {
-        // ROS_INFO("Reference Count > 0");
-        auto result = detector->detect_resized(*current_image, frame_size.width, frame_size.height, thresh, false);
-        ++fps_det_counter;
-        std::unique_lock<std::mutex> lock(mtx);
-        thread_result_vec = result;
-        consumed = true;
-        // ROS_INFO("Started darknet thread");
-        cv_detected.notify_all();
-        if (detector->wait_stream) while (consumed && !exit_flag) cv_pre_tracked.wait(lock);
-        current_image = det_image;
-      }
-    });
-  }
+  auto current_image = det_image;
+  consumed = true;
+  // ROS_INFO("Started darknet thread");
+  // ROS_INFO("Reference Count > 0");
+  auto result = detector->detect_resized(*current_image, frame_size.width, frame_size.height, thresh, false);
+  ++fps_det_counter;
+  std::unique_lock<std::mutex> lock(mtx);
+  thread_result_vec = result;
+  consumed = true;
+  // ROS_INFO("Started darknet thread");
+  cv_detected.notify_all();
+  if (detector->wait_stream) while (consumed && !exit_flag) cv_pre_tracked.wait(lock);
+  current_image = det_image;
 }
 
 void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg){
@@ -174,15 +166,9 @@ void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg){
 }
 
 void YoloROSTracker::captureThread(){
-  t_cap = std::thread([&]() {
-	//  ros::spinOnce();
-  });
   ++cur_time_extrapolate;
-  if(t_cap.joinable()){
-    t_cap.join();
-    ++fps_cap_counter;
-    cur_frame = cap_frame.clone();
-  }
+  ++fps_cap_counter;
+  cur_frame = cap_frame.clone();
 }
 
 void YoloROSTracker::trackThread(){

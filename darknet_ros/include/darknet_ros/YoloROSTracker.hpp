@@ -19,7 +19,6 @@
 
 #include "yolo_v2_class.hpp"
 #include "Extrapolate_Coordinates.hpp"
-#include <thread>
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
@@ -90,7 +89,6 @@ namespace darknet_ros {
     bool exit_flag;
     std::atomic<int> fps_det_counter, fps_cap_counter;
     int current_det_fps, current_cap_fps = 0;
-    std::thread t_detect, t_cap;
     std::mutex mtx;
     std::condition_variable cv_detected, cv_pre_tracked;
     std::chrono::steady_clock::time_point steady_start, steady_end;
