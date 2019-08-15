@@ -230,59 +230,60 @@ void YoloROSTracker::trackThread(){
   }
 }
 void YoloROSTracker::publishResult(){
-  if (!cur_frame.empty()) {
-    steady_end = std::chrono::steady_clock::now();
-    if (std::chrono::duration<double>(steady_end - steady_start).count() >= 1) {
-        current_det_fps = fps_det_counter;
-        current_cap_fps = fps_cap_counter;
-        steady_start = steady_end;
-        fps_det_counter = 0;
-        fps_cap_counter = 0;
-      }
- #ifdef TRACK_OPTFLOW
-    ++passed_flow_frames;
-    track_optflow_queue.push(cur_frame.clone());
-    result_vec = tracker_flow.tracking_flow(cur_frame);
-    extrapolate_coords.update_result(result_vec, cur_time_extrapolate);
- #endif
-    auto result_vec_draw = result_vec;
-    int const colors[6][3] = { { 1,0,1 },{ 0,0,1 },{ 0,1,1 },{ 0,1,0 },{ 1,1,0 },{ 1,0,0 } };
-    objectNumber.data = 0;
-    for(auto &i : result_vec){
-      objectNumber.data++;
-      boundingBox.Class = classLabels[i.obj_id];
-      boundingBox.prob = i.prob;
-      boundingBox.x = i.x;
-      boundingBox.y = i.y;
-      boundingBox.w = i.w;
-      boundingBox.h = i.h;
-      boundingBoxes.bounding_boxes.push_back(boundingBox);
-      cv::Scalar color = obj_id_to_color(i.obj_id);
-      cv::rectangle(cur_frame, cv::Rect(i.x, i.y, i.w, i.h), color, 2);
-      if (classLabels.size() > i.obj_id) {
-            std::string obj_name = classLabels[i.obj_id];
-            if (i.track_id > 0) obj_name += "_" + std::to_string(i.track_id);
-            boundingBox.Class = obj_name;
-            cv::Size const text_size = getTextSize(obj_name, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, 2, 0);
-            int const max_width = (text_size.width > i.w + 2) ? text_size.width : (i.w + 2);
-            cv::rectangle(cur_frame, cv::Point2f(std::max((int)i.x - 1, 0), std::max((int)i.y - 30, 0)),
-                cv::Point2f(std::min((int)i.x + max_width, cur_frame.cols-1), std::min((int)i.y, cur_frame.rows-1)),
-                color, CV_FILLED, 8, 0);
-            putText(cur_frame, obj_name, cv::Point2f(i.x, i.y - 10), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, cv::Scalar(0, 0, 0), 2);
-        }
-    }
+	if (!cur_frame.empty()) {
+		steady_end = std::chrono::steady_clock::now();
+		if (std::chrono::duration<double>(steady_end - steady_start).count() >= 1) {
+			current_det_fps = fps_det_counter;
+			current_cap_fps = fps_cap_counter;
+			steady_start = steady_end;
+			fps_det_counter = 0;
+			fps_cap_counter = 0;
+		}
+#ifdef TRACK_OPTFLOW
+		++passed_flow_frames;
+		track_optflow_queue.push(cur_frame.clone());
+		result_vec = tracker_flow.tracking_flow(cur_frame);
+		extrapolate_coords.update_result(result_vec, cur_time_extrapolate);
+#endif
+		auto result_vec_draw = result_vec;
+		int const colors[6][3] = { { 1, 0, 1 }, { 0, 0, 1 }, { 0, 1, 1 }, { 0, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 } };
+		objectNumber.data = 0;
+		boundingBoxes.bounding_boxes.clear();
+		for (auto &i : result_vec) {
+			objectNumber.data++;
+			boundingBox.Class = classLabels[i.obj_id];
+			boundingBox.prob = i.prob;
+			boundingBox.x = i.x;
+			boundingBox.y = i.y;
+			boundingBox.w = i.w;
+			boundingBox.h = i.h;
+			cv::Scalar color = obj_id_to_color(i.obj_id);
+			cv::rectangle(cur_frame, cv::Rect(i.x, i.y, i.w, i.h), color, 2);
+			if (classLabels.size() > i.obj_id) {
+				std::string obj_name = classLabels[i.obj_id];
+				if (i.track_id > 0){
+					obj_name += "_" + std::to_string(i.track_id);
+				}
+				boundingBox.Class = obj_name;
+				cv::Size const text_size = getTextSize(obj_name, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, 2, 0);
+				int const max_width = (text_size.width > i.w + 2) ? text_size.width : (i.w + 2);
+				cv::rectangle(cur_frame, cv::Point2f(std::max((int) i.x - 1, 0), std::max((int) i.y - 30, 0)), cv::Point2f(std::min((int) i.x + max_width, cur_frame.cols - 1), std::min((int) i.y, cur_frame.rows - 1)), color, CV_FILLED, 8, 0);
+				putText(cur_frame, obj_name, cv::Point2f(i.x, i.y - 10), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, cv::Scalar(0, 0, 0), 2);
+			}
+			boundingBoxes.bounding_boxes.push_back(boundingBox);
+		}
 
-    if (current_det_fps >= 0 && current_cap_fps >= 0) {
-        std::string fps_str = "FPS detection: " + std::to_string(current_det_fps);
-        putText(cur_frame, fps_str, cv::Point2f(10, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, cv::Scalar(50, 255, 0), 2);
-    }
-    objectDetectorPublisher.publish(objectNumber);
-    boundingBoxesPublisher.publish(boundingBoxes);
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cur_frame).toImageMsg();
-    detectionImagePublisher.publish(msg);
-    // ROS_INFO("Published");
+		if (current_det_fps >= 0 && current_cap_fps >= 0) {
+			std::string fps_str = "FPS detection: " + std::to_string(current_det_fps);
+			putText(cur_frame, fps_str, cv::Point2f(10, 20), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, cv::Scalar(50, 255, 0), 2);
+		}
+		objectDetectorPublisher.publish(objectNumber);
+		boundingBoxesPublisher.publish(boundingBoxes);
+		sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cur_frame).toImageMsg();
+		detectionImagePublisher.publish(msg);
+		// ROS_INFO("Published");
 
-    }
+	}
 }
 
 }
