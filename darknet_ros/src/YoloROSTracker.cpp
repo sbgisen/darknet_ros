@@ -158,7 +158,7 @@ void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   cv_bridge::CvImagePtr cv_ptr;
 
   try {
-    ROS_INFO("Callback Called");
+    // ROS_INFO("Callback Called");
     cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cap_frame = cv_ptr->image.clone();
     frame_size = cap_frame.size();
@@ -271,7 +271,7 @@ void YoloROSTracker::publishResult(){
     boundingBoxesPublisher.publish(boundingBoxes);
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", cur_frame).toImageMsg();
     detectionImagePublisher.publish(msg);
-    ROS_INFO("Published");
+    // ROS_INFO("Published");
 
     }
 }

@@ -75,7 +75,7 @@ include_directories(
 if (CUDA_FOUND)
 
   link_directories(
-    /usr/local/cuda/lib64
+    /usr/local/cuda-9.0/lib64
   )
 
   cuda_add_library(${PROJECT_NAME}_lib
