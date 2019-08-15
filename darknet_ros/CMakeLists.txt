@@ -3,6 +3,12 @@ project(darknet_ros)
 
 # Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+# set(CMAKE_C_COMPILER "/usr/bin/gcc-5")
+# set(CMAKE_CXX_COMPILER "/usr/bin/g++-5")
+
+# Add definition for CUDA
+add_definitions(-DCUDA_HOME="/usr/local/cuda-9.0")
+add_definitions(-DCUDA_TOOLKIT_ROOT_DIR="/usr/local/cuda-9.0")
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -75,7 +81,7 @@ include_directories(
 if (CUDA_FOUND)
 
   link_directories(
-    /usr/local/cuda/lib64
+    /usr/local/cuda-9.0/lib64
   )
 
   cuda_add_library(${PROJECT_NAME}_lib
