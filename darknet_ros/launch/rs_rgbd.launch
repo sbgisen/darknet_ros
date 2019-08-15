@@ -68,9 +68,9 @@ Processing enabled by this node:
   <arg name="enable_color"        default="true"/>
 
   <arg name="fisheye_fps"         default="6"/>
-  <arg name="depth_fps"           default="6"/>
-  <arg name="infra_fps"           default="6"/>
-  <arg name="color_fps"           default="6"/>
+  <arg name="depth_fps"           default="90"/>
+  <arg name="infra_fps"           default="90"/>
+  <arg name="color_fps"           default="60"/>
   <arg name="gyro_fps"            default="400"/>
   <arg name="accel_fps"           default="250"/>
   <arg name="enable_gyro"         default="false"/>
@@ -151,6 +151,17 @@ Processing enabled by this node:
       <arg name="filters"                  value="$(arg filters)"/>
     </include>
 
+    <!-- Drop down topics(throttle) -->
+    <node pkg="nodelet" type="nodelet" name="rgb_throttle" args="load jsk_topic_tools/LightweightThrottle $(arg manager)" output="screen">
+      <remap from="~input"  to="$(arg rgb)/image_raw"/>
+      <remap from="~output" to="$(arg rgb)/image_throttle"/>
+      <param name="update_rate" value="5.0" />
+    </node>
+    <node pkg="nodelet" type="nodelet" name="depth_throttle" args="load jsk_topic_tools/LightweightThrottle $(arg manager)" output="screen">
+      <remap from="~input"  to="$(arg depth)/image_rect_raw"/>
+      <remap from="~output" to="$(arg depth)/image_rect_throttle"/>
+      <param name="update_rate" value="5.0" />
+    </node>
     <!-- RGB processing -->
     <include if="$(arg rgb_processing)"
              file="$(find rgbd_launch)/launch/includes/rgb.launch.xml">
