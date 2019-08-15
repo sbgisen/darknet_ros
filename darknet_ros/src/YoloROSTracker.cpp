@@ -20,10 +20,16 @@ YoloROSTracker::YoloROSTracker(ros::NodeHandle nh)
     initROS();
     initdarknet();
     while(true){
-      captureThread();
-      trackThread();
-      darknetThread();
-      publishResult();
+      ros::spinOnce();
+      if(waitCameraflag_ == true){
+        waitCameraflag_ = false;
+        captureThread();
+        trackThread();
+        darknetThread();
+        publishResult();
+      }else{
+        usleep(100);
+      }
       if(!ros::ok()) break;
     }
   }
@@ -135,15 +141,15 @@ void YoloROSTracker::darknetThread(){
   t_detect = std::thread([&]() {
     auto current_image = det_image;
     consumed = true;
-    ROS_INFO("Started darknet thread");
+    // ROS_INFO("Started darknet thread");
     while (current_image.use_count() > 0 && !exit_flag) {
-           ROS_INFO("Reference Count > 0");
+           // ROS_INFO("Reference Count > 0");
            auto result = detector->detect_resized(*current_image, frame_size.width, frame_size.height, thresh, false);
            ++fps_det_counter;
            std::unique_lock<std::mutex> lock(mtx);
            thread_result_vec = result;
            consumed = true;
-           ROS_INFO("Started darknet thread");
+           // ROS_INFO("Started darknet thread");
            cv_detected.notify_all();
            if (detector->wait_stream) while (consumed && !exit_flag) cv_pre_tracked.wait(lock);
            current_image = det_image;
@@ -151,8 +157,8 @@ void YoloROSTracker::darknetThread(){
     });
   }
 }
-void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
-  {
+void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg){
+  waitCameraflag_ = true;
   ROS_DEBUG("[YoloROSDetector] ROS image received.");
 
   cv_bridge::CvImagePtr cv_ptr;
@@ -169,7 +175,9 @@ void YoloROSTracker::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   return;
 }
 void YoloROSTracker::captureThread(){
-  t_cap = std::thread([&]() { ros::spinOnce(); });
+  t_cap = std::thread([&]() {
+	//  ros::spinOnce();
+  });
   ++cur_time_extrapolate;
   if(t_cap.joinable()){
     t_cap.join();
@@ -179,7 +187,7 @@ void YoloROSTracker::captureThread(){
 }
 void YoloROSTracker::trackThread(){
   if(consumed){
-    ROS_INFO("Inside tracking");
+    // ROS_INFO("Inside tracking");
       std::unique_lock<std::mutex> lock(mtx);
       det_image = detector->mat_to_image_resize(cur_frame);
       auto old_result_vec = detector->tracking_id(result_vec);
@@ -220,7 +228,7 @@ void YoloROSTracker::trackThread(){
     result_vec = tracker_flow.tracking_flow(cur_frame, true);
  #endif
     consumed = false;
-    ROS_INFO("Consumder Done");
+    // ROS_INFO("Consumder Done");
     cv_pre_tracked.notify_all();
   }
 }
@@ -254,7 +262,7 @@ void YoloROSTracker::publishResult(){
       cv::rectangle(cur_frame, cv::Rect(i.x, i.y, i.w, i.h), color, 2);
       if (classLabels.size() > i.obj_id) {
             std::string obj_name = classLabels[i.obj_id];
-            if (i.track_id > 0) obj_name += " - " + std::to_string(i.track_id);
+            if (i.track_id > 0) obj_name += "_" + std::to_string(i.track_id);
             cv::Size const text_size = getTextSize(obj_name, cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2, 2, 0);
             int const max_width = (text_size.width > i.w + 2) ? text_size.width : (i.w + 2);
             cv::rectangle(cur_frame, cv::Point2f(std::max((int)i.x - 1, 0), std::max((int)i.y - 30, 0)),

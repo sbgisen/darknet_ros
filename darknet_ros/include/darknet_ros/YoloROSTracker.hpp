@@ -41,6 +41,8 @@ namespace darknet_ros {
     void darknetThread();
     void publishResult();
 
+    bool waitCameraflag_;
+
     // ROS
     ros::NodeHandle nodeHandle;
     image_transport::ImageTransport imageTransport;
@@ -90,6 +92,7 @@ namespace darknet_ros {
     std::mutex mtx;
     std::condition_variable cv_detected, cv_pre_tracked;
     std::chrono::steady_clock::time_point steady_start, steady_end;
+
 
   };
 };
