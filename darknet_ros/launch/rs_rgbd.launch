@@ -157,6 +157,11 @@ Processing enabled by this node:
       <remap from="~output" to="$(arg rgb)/image_throttle"/>
       <param name="update_rate" value="5.0" />
     </node>
+    <node pkg="nodelet" type="nodelet" name="rgb_rect_throttle" args="load jsk_topic_tools/LightweightThrottle $(arg manager)" output="screen">
+      <remap from="~input"  to="$(arg rgb)/image_rect_color"/>
+      <remap from="~output" to="$(arg rgb)/image_rect_throttle"/>
+      <param name="update_rate" value="5.0" />
+    </node>
     <node pkg="nodelet" type="nodelet" name="depth_throttle" args="load jsk_topic_tools/LightweightThrottle $(arg manager)" output="screen">
       <remap from="~input"  to="$(arg depth)/image_rect_raw"/>
       <remap from="~output" to="$(arg depth)/image_rect_throttle"/>
@@ -176,14 +181,14 @@ Processing enabled by this node:
             args="load depth_image_proc/register $(arg manager) $(arg bond)" respawn="$(arg respawn)">
         <remap from="rgb/camera_info"             to="$(arg rgb)/camera_info" />
         <remap from="depth/camera_info"           to="$(arg depth)/camera_info" />
-        <remap from="depth/image_rect"            to="$(arg depth)/image_rect_raw" />
+        <remap from="depth/image_rect"            to="$(arg depth)/image_rect_throllte" />
         <remap from="depth_registered/image_rect" to="$(arg depth_registered)/sw_registered/image_rect_raw" />
       </node>
 
       <!-- Publish registered XYZRGB point cloud with software registered input -->
       <node pkg="nodelet" type="nodelet" name="points_xyzrgb_sw_registered"
             args="load depth_image_proc/point_cloud_xyzrgb $(arg manager) $(arg bond)" respawn="$(arg respawn)">
-        <remap from="rgb/image_rect_color"        to="$(arg rgb)/image_rect_color" />
+        <remap from="rgb/image_rect_color"        to="$(arg rgb)/image_rect_throttle" />
         <remap from="rgb/camera_info"             to="$(arg rgb)/camera_info" />
         <remap from="depth_registered/image_rect" to="$(arg depth_registered_filtered)/sw_registered/image_rect_raw" />
         <remap from="depth_registered/points"     to="$(arg depth_registered)/points" />
@@ -194,7 +199,7 @@ Processing enabled by this node:
       <!-- Publish registered XYZRGB point cloud with hardware registered input (ROS Realsense depth alignment) -->
       <node pkg="nodelet" type="nodelet" name="points_xyzrgb_hw_registered"
             args="load depth_image_proc/point_cloud_xyzrgb $(arg manager) $(arg bond)" respawn="$(arg respawn)">
-        <remap from="rgb/image_rect_color"        to="$(arg rgb)/image_rect_color" />
+        <remap from="rgb/image_rect_color"        to="$(arg rgb)/image_rect_throttle" />
         <remap from="rgb/camera_info"             to="$(arg rgb)/camera_info" />
         <remap from="depth_registered/image_rect" to="$(arg depth_registered)/image_raw" />
         <remap from="depth_registered/points"     to="$(arg depth_registered_pub)/points" />
