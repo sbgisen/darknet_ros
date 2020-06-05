@@ -7,8 +7,8 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 # set(CMAKE_CXX_COMPILER "/usr/bin/g++-5")
 
 # Add definition for CUDA
-add_definitions(-DCUDA_HOME="/usr/local/cuda-9.0")
-add_definitions(-DCUDA_TOOLKIT_ROOT_DIR="/usr/local/cuda-9.0")
+add_definitions(-DCUDA_HOME="/usr/local/cuda-10.0")
+add_definitions(-DCUDA_TOOLKIT_ROOT_DIR="/usr/local/cuda-10.0")
 
 # Define path of darknet folder here.
 find_path(DARKNET_PATH
@@ -73,6 +73,7 @@ catkin_package(
 include_directories(
   ${DARKNET_PATH}/src
   ${DARKNET_PATH}/include
+	${DARKNET_PATH}/3rdparty/stb/include
   include
   ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
@@ -81,7 +82,7 @@ include_directories(
 if (CUDA_FOUND)
 
   link_directories(
-    /usr/local/cuda-9.0/lib64
+    /usr/local/cuda-10.0/lib64
   )
 
   cuda_add_library(${PROJECT_NAME}_lib
@@ -101,7 +102,7 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/normalization_layer.c
     ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/option_list.c
     ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/parser.c
-    ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/region_layer.c
+    ${DARKNET_PATH}/src/dark_cuda.c               ${DARKNET_PATH}/src/region_layer.c
     ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/reorg_layer.c
                                                   ${DARKNET_PATH}/src/reorg_old_layer.c
     ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/rnn_layer.c
@@ -161,7 +162,7 @@ else()
     ${DARKNET_PATH}/src/cost_layer.c              ${DARKNET_PATH}/src/normalization_layer.c
     ${DARKNET_PATH}/src/crnn_layer.c              ${DARKNET_PATH}/src/option_list.c
     ${DARKNET_PATH}/src/crop_layer.c              ${DARKNET_PATH}/src/parser.c
-    ${DARKNET_PATH}/src/cuda.c                    ${DARKNET_PATH}/src/region_layer.c
+    ${DARKNET_PATH}/src/dark_cuda.c               ${DARKNET_PATH}/src/region_layer.c
     ${DARKNET_PATH}/src/data.c                    ${DARKNET_PATH}/src/reorg_layer.c
                                                   ${DARKNET_PATH}/src/reorg_old_layer.c
     ${DARKNET_PATH}/src/deconvolutional_layer.c   ${DARKNET_PATH}/src/rnn_layer.c
