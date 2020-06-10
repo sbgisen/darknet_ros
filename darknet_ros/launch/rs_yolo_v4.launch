@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  <!-- Include main launch file -->
+  <include file="$(find darknet_ros)/launch/darknet_ros.launch">
+    <arg name="network_param_file"	value="$(find darknet_ros)/config/yolov4.yaml"/>
+    <arg name="ros_param_file"		value="$(find darknet_ros)/config/ros_realsense.yaml"/>
+  </include>
+
+</launch>

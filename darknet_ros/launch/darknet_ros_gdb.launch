@@ -5,7 +5,7 @@
   <!-- Launch darknet ros with gdb launch prefix -->
   <include file="$(find darknet_ros)/launch/darknet_ros.launch">
     <arg name="launch_prefix"   value="gdb -ex run --args"/>
-    <arg name="network_param_file" value="$(find darknet_ros)/config/yolov3.yaml"/>
+    <arg name="network_param_file" value="$(find darknet_ros)/config/yolov4.yaml"/>
   </include>
 
 </launch>
