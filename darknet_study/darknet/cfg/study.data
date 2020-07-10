@@ -1,0 +1,5 @@
+classes=1
+train=/home/gisen/yolo_study/train.txt
+valid=/home/gisen/yolo_study/test.txt
+names=/home/gisen/yolo_study/names.list
+backup=/home/gisen/yolo_study/backup

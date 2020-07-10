@@ -1,0 +1,2 @@
+/home/gisen/yolo_study/datasets/t1.jpg
+/home/gisen/yolo_study/datasets/t2.jpg
