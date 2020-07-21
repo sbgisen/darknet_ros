@@ -115,6 +115,9 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/http_stream.cpp           ${DARKNET_PATH}/src/upsample_layer.c
     ${DARKNET_PATH}/src/lstm_layer.c              ${DARKNET_PATH}/src/yolo_layer.c
 
+		${DARKNET_PATH}/src/gaussian_yolo_layer.c     ${DARKNET_PATH}/src/conv_lstm_layer.c
+		${DARKNET_PATH}/src/image_opencv.cpp					${DARKNET_PATH}/src/scale_channels_layer.c
+		${DARKNET_PATH}/src/sam_layer.c
 
 
     ${DARKNET_PATH}/src/activation_kernels.cu     ${DARKNET_PATH}/src/crop_layer_kernels.cu
@@ -173,8 +176,12 @@ else()
     ${DARKNET_PATH}/src/gemm.c                    ${DARKNET_PATH}/src/tree.c
     ${DARKNET_PATH}/src/gru_layer.c               ${DARKNET_PATH}/src/utils.c
     ${DARKNET_PATH}/src/http_stream.cpp
-    ${DARKNET_PATH}/src/upsample_layer.c	  ${DARKNET_PATH}/src/lstm_layer.c
+    ${DARKNET_PATH}/src/upsample_layer.c	  			${DARKNET_PATH}/src/lstm_layer.c
                                                   ${DARKNET_PATH}/src/yolo_layer.c
+
+		${DARKNET_PATH}/src/gaussian_yolo_layer.c     ${DARKNET_PATH}/src/conv_lstm_layer.c
+		${DARKNET_PATH}/src/image_opencv.cpp					${DARKNET_PATH}/src/scale_channels_layer.c
+		${DARKNET_PATH}/src/sam_layer.c
 
   )
 
