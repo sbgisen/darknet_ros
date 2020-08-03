@@ -3,6 +3,7 @@ project(darknet_ros)
 
 # Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_C_COMPILER /usr/bin/gcc-6 CACHE PATH "" FORCE)
 # set(CMAKE_C_COMPILER "/usr/bin/gcc-5")
 # set(CMAKE_CXX_COMPILER "/usr/bin/g++-5")
 
