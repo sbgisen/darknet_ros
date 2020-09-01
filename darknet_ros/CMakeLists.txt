@@ -134,8 +134,8 @@ if (CUDA_FOUND)
     pthread
     stdc++
     cuda
-    cublas
     ${CUDA_LIBRARIES}
+    ${CUDA_cublas_LIBRARY}
     ${CUDA_curand_LIBRARY}
     ${Boost_LIBRARIES}
     ${OpenCV_LIBRARIES}
