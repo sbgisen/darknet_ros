@@ -48,6 +48,7 @@ namespace darknet_ros {
     ros::Publisher boundingBoxesPublisher;
     ros::Publisher detectionImagePublisher;
     ros::Publisher objectDetectorPublisher;
+    std_msgs::Header image_header;
 
     // Yolo Object Detector API
 
