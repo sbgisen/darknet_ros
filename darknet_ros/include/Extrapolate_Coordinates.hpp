@@ -1,6 +1,7 @@
 #include "yolo_v2_class.hpp"
 
-class extrapolate_coords_t{
+class extrapolate_coords_t
+{
 public:
   std::vector<bbox_t> old_result_vec;
   std::vector<float> dx_vec, dy_vec, time_vec;

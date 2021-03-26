@@ -2,7 +2,8 @@
 #include "opencv2/video/tracking.hpp"
 #include <opencv2/highgui/highgui.hpp>
 
-class track_kalman{
+class track_kalman
+{
 public:
   track_kalman(int _state_size, int _meas_size, int _contr_size);
 
