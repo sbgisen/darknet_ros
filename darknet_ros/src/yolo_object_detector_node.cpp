@@ -9,7 +9,8 @@ void mySigintHandler(int sig)
   ros::shutdown();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "darknet_ros");
   ros::NodeHandle nodeHandle("~");
   darknet_ros::YoloROSTracker yoloROSTracker(nodeHandle);

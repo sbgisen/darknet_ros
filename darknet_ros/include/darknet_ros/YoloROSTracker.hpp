@@ -23,77 +23,76 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace darknet_ros {
-  class YoloROSTracker{
-  public:
-    explicit YoloROSTracker(ros::NodeHandle nh);
-    ~YoloROSTracker();
-  private:
+namespace darknet_ros
+{
+class YoloROSTracker
+{
+public:
+  explicit YoloROSTracker(ros::NodeHandle nh);
+  ~YoloROSTracker();
 
-    void initROS();
-    void initdarknet();
-    void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
-    bool readParameters();
-    void captureThread();
-    void trackThread();
-    void darknetThread();
-    void publishResult();
+private:
+  void initROS();
+  void initdarknet();
+  void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
+  bool readParameters();
+  void captureThread();
+  void trackThread();
+  void darknetThread();
+  void publishResult();
 
-    bool waitCameraflag_;
+  bool waitCameraflag_;
 
-    // ROS
-    ros::NodeHandle nodeHandle;
-    image_transport::ImageTransport imageTransport;
-    image_transport::Subscriber imageSubscriber;
-    ros::Publisher boundingBoxesPublisher;
-    ros::Publisher detectionImagePublisher;
-    ros::Publisher objectDetectorPublisher;
-    std_msgs::Header image_header;
+  // ROS
+  ros::NodeHandle nodeHandle;
+  image_transport::ImageTransport imageTransport;
+  image_transport::Subscriber imageSubscriber;
+  ros::Publisher boundingBoxesPublisher;
+  ros::Publisher detectionImagePublisher;
+  ros::Publisher objectDetectorPublisher;
+  std_msgs::Header image_header;
 
-    // Yolo Object Detector API
+  // Yolo Object Detector API
 
-    Detector *detector;
-    float thresh;
+  Detector* detector;
+  float thresh;
 
-    // ROS Parameters
-    bool viewImage_;
-    bool enableConsoleOutput_;
-    int waitKeyDelay_;
+  // ROS Parameters
+  bool viewImage_;
+  bool enableConsoleOutput_;
+  int waitKeyDelay_;
 
-    //! Class labels.
-    std::vector<std::string> classLabels;
+  //! Class labels.
+  std::vector<std::string> classLabels;
 
+  //! Detected objects.
+  darknet_ros_msgs::BoundingBox boundingBox;
+  darknet_ros_msgs::BoundingBoxes boundingBoxes;
 
-    //! Detected objects.
-    darknet_ros_msgs::BoundingBox boundingBox;
-    darknet_ros_msgs::BoundingBoxes boundingBoxes;
+  std_msgs::Int8 objectNumber;
 
-    std_msgs::Int8 objectNumber;
-
-    // Tracking
-    extrapolate_coords_t extrapolate_coords;
+  // Tracking
+  extrapolate_coords_t extrapolate_coords;
 #ifdef TRACK_OPTFLOW
-    Tracker_optflow tracker_flow;
+  Tracker_optflow tracker_flow;
 #endif
-    bool extrapolate_flag = false;
-    float cur_time_extrapolate = 0, old_time_extrapolate = 0;
-    bool show_small_boxes = false;
-    std::queue<cv::Mat> track_optflow_queue;
-    int passed_flow_frames = 0;
+  bool extrapolate_flag = false;
+  float cur_time_extrapolate = 0, old_time_extrapolate = 0;
+  bool show_small_boxes = false;
+  std::queue<cv::Mat> track_optflow_queue;
+  int passed_flow_frames = 0;
 
-    // Detection
-    cv::Mat cap_frame, cur_frame, det_frame;
-    cv::Size frame_size;
-    std::shared_ptr<image_t> det_image;
-    std::vector<bbox_t> result_vec, thread_result_vec;
-    std::atomic<bool> consumed;
-    bool exit_flag;
-    std::atomic<int> fps_det_counter, fps_cap_counter;
-    int current_det_fps, current_cap_fps = 0;
-    std::mutex mtx;
-    std::condition_variable cv_detected, cv_pre_tracked;
-    std::chrono::steady_clock::time_point steady_start, steady_end;
-
-
-  };
+  // Detection
+  cv::Mat cap_frame, cur_frame, det_frame;
+  cv::Size frame_size;
+  std::shared_ptr<image_t> det_image;
+  std::vector<bbox_t> result_vec, thread_result_vec;
+  std::atomic<bool> consumed;
+  bool exit_flag;
+  std::atomic<int> fps_det_counter, fps_cap_counter;
+  int current_det_fps, current_cap_fps = 0;
+  std::mutex mtx;
+  std::condition_variable cv_detected, cv_pre_tracked;
+  std::chrono::steady_clock::time_point steady_start, steady_end;
 };
+};  // namespace darknet_ros
